@@ -36,11 +36,11 @@ This virtual machine can be interpreted itself by a virtual machine (This is the
 Majority of languages go through a compilation process before being executed or interpreted.
 Bash scripts, executed by a **virtual machine** is an exception. In this case the **source code** is line by line interpreted.
 
-# What is a JiT compiler
-a JiT compiler (JiT as **J**ust **i**n **T**ime) is a tool used by a **virtual machine** when interpreting a program from a **interpreted language**. This tool is responsible for converting this program (or a part of this program) during the interpretation to an executable one performed by processor, in order to speed up computing. In other words, the interpreter create binary program from a **interpreted language**, and run it by processor instead of interpret it.
+# What is a JiT compiler ?
+A JiT compiler (JiT as **J**ust **i**n **T**ime) is a tool used by a **virtual machine** when interpreting a program from a **interpreted language**. This tool is responsible for converting this program (or a part of this program) during the interpretation to an executable one performed by processor, in order to speed up computing. In other words, the interpreter create binary program from a **interpreted language**, and run it by processor instead of interpret it.
 Most of the time, this transformation is the opportunity to optimize program based on context.
 
-The following table describe diferent interpreters :
+The following table describe different interpreters :
 
 
 | Langage interprété   | JiT VM |  URL des projets |
@@ -54,3 +54,6 @@ The following table describe diferent interpreters :
 | Ruby | RuJIT | https://github.com/imasahiro/rujit |
 | Tcl  | no JiT | |
 | VBScript | no JiT | |
+
+# What's next ?
+The next step is to build your first interpreted language, helped by lex and yacc.
