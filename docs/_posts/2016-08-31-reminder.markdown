@@ -43,7 +43,7 @@ Most of the time, this transformation is the opportunity to optimize program bas
 The following table describe diferent interpreters :
 
 
-| Langage interprété   | JiT VM |  URL du projet |
+| Langage interprété   | JiT VM |  URL des projets |
 |----------------------|--------|----------------|
 | PHP |  HHVM | http://hhvm.com |
 | Javascript | SpiderMonkey  | http://developer.mozilla.org/en/SpiderMonkey |

@@ -46,7 +46,14 @@ ul {
 		}
 	}
 }
-
+table, th, td {
+	border: 1px solid $color-grey; 
+	border-spacing: 0;
+	vertical-align: middle;
+}
+th, td {
+	padding: 5px;
+}
 
 .wrapper {
 	max-width: 600px;
@@ -238,3 +245,4 @@ ul {
 		}
 	}
 }
+
