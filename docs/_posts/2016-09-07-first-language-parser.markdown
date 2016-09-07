@@ -221,7 +221,7 @@ int main(int argc, char **argv) {
 ## Lexical analysis
 The lexical analysis is divided into three parts:
 
-* Declarations between `{%` and `%}`, inserted at the beginning of the syntax analysis code.
+* Declarations between `\{\%` and `\%\}`, inserted at the beginning of the syntax analysis code.
 * Productions, between `%%`, like `regular expression  action;`
 * Additionnal code at the end. The `yywrap` function is called at the end of parsing. 
 
@@ -264,11 +264,10 @@ $ git clone git@github.com:RemiBauzac/jit.git
 $ cd jit && git checkout first-language-parser
 $ cd src && make
 $ ...
-$ ls Makefile      lang.h        langc         parser.l      parser.lex.c  parser.lex.h  parser.lex.o  parser.y      parser.yacc.c parser.yacc.h parser.yacc.o test.lang
 ```
 
 # Run
-To run parser, you have just to run langc binary without parameter. It now wait for commands. You have just to type `return 69` then press enter and Ctrl-D. The parser exits and create out.bc file.
+To run parser, you have just to run langc binary without parameter: `./langc`. It now wait for commands. You have just to type `return 69` then press enter and Ctrl-D. The parser exits and create out.bc file.
 The out.bc file is the intermediate language (.bc as bytecode).
 
 To check the result : run `hexdump out.bc`. Please find the result analysis :
