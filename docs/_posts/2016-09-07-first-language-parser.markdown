@@ -17,11 +17,11 @@ An interpreted language is divided in 2 parts:
 The high level language is understandable by a human, so that he can easily interact with it.
 As an example, the following Lua piece of code:
 
-```
+{% highlight lua %}
 local a = 4
 local b = 5
 if a > b then print('a is greater than b !') end
-```
+{% endhighlight %}
 
 First, you'll create the simplest language possible in order to focus on the structure of the components. This language only accepts the keyword `return`, followed by a 64 bits integer (positive or negative): hard to make simpler:
 
@@ -35,19 +35,20 @@ In this example, you just need one _operation code_ : `OP_RETURN`.
 
 You can represent the list of possible _operation codes_ like the following C enum:
 
-```
+{% highlight c %}
 typedef enum {
   OP_RETURN,
 } opCode;
-```
+{% endhighlight %}
+
 You need to ceate the _operation_ structure with _operation code_ and parameters. In this example, you just need a 64 bits integer as the return value of `OP_RETURN` _operation code_.
 
-```
+{% highlight c %}
 typedef struct _operation {
   opCode op;
   int64_t param;
 } operation;
-```
+{% endhighlight %}
 
 # Implementation
 You need to create three main components:
@@ -87,7 +88,7 @@ A `yacc` file is divided in 3 parts:
 
 The `yacc` declaration part (in C language) looks like:
 
-```
+{% highlight c %}
 /* native language declarations */
 %{
 #include "lang.h"
@@ -104,11 +105,11 @@ function fmain;
 FILE *out;
 static void append_code(function *f, operation o);
 %}
-```
+{% endhighlight %}
 
 The grammar production part for this example is:
 
-```
+{% highlight c %}
 %%
 
 program:
@@ -121,23 +122,24 @@ main:
   ;
 
 %%
-```
+{% endhighlight %}
 
 And, finally, additionnal code for:
 
 * Error handling
 
-```
+{% highlight c %}
 /* Parsing error handler */
 void yyerror(char *s) {
   extern int yylineno;  // defined and maintained in lexer
   extern char *yytext;  // defined and maintained in lexer
   fprintf(stderr, "%d: %s at %s\n", yylineno, s, yytext);
 }
-``` 
+{% endhighlight %}
+
 * A function to append code in code list (intermediate language)
 
-```
+{% highlight c %}
 /**
  * append code to code list for a function.
  * This function is suboptimal but easy to understand.
@@ -150,11 +152,11 @@ static void append_code(function *f, operation o)
   if (f->code)
     f->code[f->codesz-1] = o;
 }
-```
+{% endhighlight %}
 
 * a function to dump the intermediate language to a file
 
-```
+{% highlight c %}
 /**
  * dump_function function:
  * used to dump a function to a file
@@ -168,11 +170,11 @@ static void dump_function(FILE *out, function *f)
   fwrite(&f->codesz, sizeof(uint32_t), 1, out);
   fwrite(f->code, sizeof(operation), f->codesz, out);
 }
-```
+{% endhighlight %}
 
 * and, finally, the `main()` function:
 
-```
+{% highlight c %}
 /**
  * main parser function:
  * argv[1] is the input file name, by default stdin
@@ -216,28 +218,27 @@ int main(int argc, char **argv) {
   fclose(yyin);
   fclose(out);
 }
-
-```
+{% endhighlight %}
 
 ## Lexical analysis
 The lexical analysis is divided in three parts:
 
-* Declarations, between `{%` and `%}`, inserted at the beginning of the syntax analysis code.
+* Declarations, between `\{\%` and `\%\}`, inserted at the beginning of the syntax analysis code.
 * Productions, between `%%`, like `regular expression  action;`
 * Additionnal code at the end. The `yywrap` function is called at the end of parsing. 
 
 In the example, the declarations are describe in `parser.l`:
 
-```
+{% highlight c %}
 %{
 #include "sparser.yacc.h"
 void yyerror(char *);
 %}
-```
+{% endhighlight %}
 
 Production between `%%` in the same file :
 
-```
+{% highlight c %}
 "return" return RETURN;
 [ \t\n]+ ; /* ignoring whitespaces */
 [0-9]+ {
@@ -249,23 +250,23 @@ Production between `%%` in the same file :
   return INTEGER;
 }
 .  yyerror("Unknown character");
-```
+{% endhighlight %}
 
 And finally, the additionnal code, as short as possible:
 
-```
+{% highlight c %}
 int yywrap(void) { return 1; }
-```
+{% endhighlight %}
 
 # Build
 The code is [here](https://github.com/RemiBauzac/jit/tree/first-language-parser). To build the parser, clone the project and run `make`. The codes build easily on Linux or MacOS:
 
-```
+{% highlight shell %}
 $ git clone git@github.com:RemiBauzac/jit.git
 $ cd jit && git checkout first-language-parser
 $ cd src && make
 $ ...
-```
+{% endhighlight %}
 
 # Run
 To run the parser, you have just to run the `langc` binary, without any parameter: `./langc`. It now waits for commands. You just have to type `return 69` then press <kbd>enter</kbd> and <kbd>Ctrl-D</kbd>. The parser exits and creates the `out.bc` file.  
@@ -273,12 +274,13 @@ This `out.bc` file is the intermediate language (`.bc` as bytecode).
 
 To check the result, run `hexdump out.bc`. Here is the resulting analysis:
 
-```
+{% highlight shell %}
 $ hexdump out.bc
 0000000 ef be ad de 01 00 00 00 01 00 00 00 01 00 00 00
 0000010 45 00 00 00 00 00 00 00
 0000018
-```
+{% endhighlight %}
+
 * `ef be ad de` is the cookie to know that the bytecode is yours
 * the first `01 00 00 00` is the version (please note the big endian representation of integers)
 * the second `01 00 00 00` is the code size

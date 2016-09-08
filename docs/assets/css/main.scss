@@ -208,9 +208,10 @@ th, td {
 			padding: 10px;
 			line-height: 1.5;
 			border-radius: 3px;
-			background: $color-black;
+			border: solid 2px $color-black;
+			background: none;
+			white-space: pre; overflow-x: auto; word-wrap: normal;
 			code {
-				color: $color-code;
 				background: none;
 			}
 		}

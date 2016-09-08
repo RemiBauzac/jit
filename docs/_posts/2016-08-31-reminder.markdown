@@ -56,4 +56,4 @@ The following table lists different interpreters:
 | VBScript | no JiT | |
 
 # What's next ?
-The next step is to build your first interpreted language, with the help of `lex` and `yacc`.
+The next step is to build your first interpreted language, with the help of `lex` and `yacc`. You can start [here](http://jit.bauzac.net/blog/first-language-parser)
