@@ -287,6 +287,6 @@ $ hexdump out.bc
 * the third `01 00 00 00` is the opcode (OP_RETURN)
 * `45 00 00 00 00 00 00 00` is 64 bits big endian representation of `69`
 
-# What's next
-The next post will be about loading and interpreting this bytecode. See you soon.
+# What's next ?
+The [next post](http://jit.bauzac.net/blog/first-language-vm) will be about loading and interpreting this bytecode. See you soon.
 
