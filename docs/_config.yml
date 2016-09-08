@@ -7,6 +7,7 @@ name: JiT workshop
 description: JiT workshop
 google_verification: null
 
+url: http://jit.bauzac.net
 
 # File management
 include: [".htaccess"]
