@@ -6,16 +6,16 @@ author: Rémi Bauzac
 
 ---
 
-An interpreted language is divided into 2 parts :
+An interpreted language is divided in 2 parts:
 
-* High level language : human readable (and understanable) source code
-* Intermediate language : commonly a binary representation of the high level language transformation. Most of the time, this language is hidden to the user. The intermediate language is interpreted by the virtual machine.
+* High level language: human readable (and understandable) source code
+* Intermediate language: commonly, a binary representation of the high level language transformation. Most of the time, this language is hidden to the user. The intermediate language is interpreted by the virtual machine.
 
 # Definitions
 
 ## High level language
-The high level language is understanable by a human, so that he can easily interact with it.
-As an example, the folowing Lua piece of code :
+The high level language is understandable by a human, so that he can easily interact with it.
+As an example, the following Lua piece of code:
 
 ```
 local a = 4
@@ -23,16 +23,17 @@ local b = 5
 if a > b then print('a is greater than b !') end
 ```
 
-First, you'll create the simplest language possible in order to focus on the structure of the components. This language only accepts the keyword _return_, followed by an 64 bit integer (positive or negative) : hard to make simpler :
+First, you'll create the simplest language possible in order to focus on the structure of the components. This language only accepts the keyword `return`, followed by a 64 bits integer (positive or negative): hard to make simpler:
 
 ```
 return 3
 ```
 
 ## Intermediate language
-The intermediate language is mainly a command list (called _operations_) which represent high level language as a binary structure. Each operation contains an action (called _operation code_) and parameters. The intermediate language is commonly called _bytecode_.
-In this example, you just need one _operation code_ : `OP_RETURN`
-You can represent list of _operation code_ like the following C enum :
+The intermediate language is mainly a command list (called _operations_) which represents high level language as a binary structure. Each operation contains an action (called _operation code_) and parameters. The intermediate language is commonly called _bytecode_.
+In this example, you just need one _operation code_ : `OP_RETURN`.
+
+You can represent the list of possible _operation codes_ like the following C enum:
 
 ```
 typedef enum {
@@ -49,42 +50,42 @@ typedef struct _operation {
 ```
 
 # Implementation
-You need to create three main components :
+You need to create three main components:
 
-* Compiler to transform high level language to intermediate language with :
+* The compiler, to transform the high level language to an intermediate language, with:
   * Lexical and syntax analysis
   * Intermediate language generation
   * Optimisations (optional)
-* Interpreter to execute commands
-* JiT compiler to create executable code
+* The interpreter, to execute commands
+* And the JiT compiler, to create executable code.
 
-This blog post is focus on compiler.
+This blog post is focused on the compiler.
 
-The compiler is build with :
+The compiler is build with:
 
 * [flex](http://flex.sourceforge.net) for the lexical analysis:
-  * Lexical definitions as Input
-  * Build a minimal automate to reconnaitre the lexical definition
+  * Lexical definitions as input
+  * Build a minimal automate to identify the lexical definition
 * [bison](http://savannah.gnu.org/git/?group=bison) for the syntax analysis:
-  * Traduction schema as input (grammar and actions) 
+  * Translation schema as input (grammar and actions) 
   * Build a syntax analyser for the schema
   
 This blog is not the place to describe **flex** and **bison** behavior. Internet is a gold mine to find documents and tutorials.
 
 ## syntax analysis
-For syntax analysis, you need to use `yacc` (Yet Another Compiler Compiler), a **bison** implementation. [This article](http://www.linux-france.org/article/devl/lexyacc/minimanlexyacc-3.html) explain how `yacc` work.
+For syntax analysis, you need to use `yacc` (Yet Another Compiler Compiler), a **bison** implementation. [This article](http://www.linux-france.org/article/devl/lexyacc/minimanlexyacc-3.html) explains how `yacc` work.
 
-A `yacc` file is divided into 3 parts:
+A `yacc` file is divided in 3 parts:
 
-* Declarations :
+* Declarations:
   * target language declaration (in C)
-  * tokens (%token)
-  * the current token (%union)
-  * grammar axiom (%start) 
+  * tokens (`%token`)
+  * the current token (`%union`)
+  * grammar axiom (`%start`) 
 * grammar productions
-* additionnal code, contains `main()`  function declatation and `yyerror()` function (called on syntax error)
+* additionnal code, which contains the `main()` function declaration and the `yyerror()` function (called on syntax error)
 
-The `yacc` declaration part (in C language) looks like :
+The `yacc` declaration part (in C language) looks like:
 
 ```
 /* native language declarations */
@@ -105,7 +106,7 @@ static void append_code(function *f, operation o);
 %}
 ```
 
-The grammar production part for this example is :
+The grammar production part for this example is:
 
 ```
 %%
@@ -122,7 +123,7 @@ main:
 %%
 ```
 
-And finally additionnal code for :
+And, finally, additionnal code for:
 
 * Error handling
 
@@ -151,7 +152,7 @@ static void append_code(function *f, operation o)
 }
 ```
 
-* a function to dump the intermediate language in a file
+* a function to dump the intermediate language to a file
 
 ```
 /**
@@ -169,7 +170,7 @@ static void dump_function(FILE *out, function *f)
 }
 ```
 
-* and finally `main()` function:
+* and, finally, the `main()` function:
 
 ```
 /**
@@ -219,13 +220,13 @@ int main(int argc, char **argv) {
 ```
 
 ## Lexical analysis
-The lexical analysis is divided into three parts:
+The lexical analysis is divided in three parts:
 
-* Declarations between `\{\%` and `\%\}`, inserted at the beginning of the syntax analysis code.
+* Declarations, between `{%` and `%}`, inserted at the beginning of the syntax analysis code.
 * Productions, between `%%`, like `regular expression  action;`
 * Additionnal code at the end. The `yywrap` function is called at the end of parsing. 
 
-In the example, the declarations are describe in parser.l :
+In the example, the declarations are describe in `parser.l`:
 
 ```
 %{
@@ -250,14 +251,14 @@ Production between `%%` in the same file :
 .  yyerror("Unknown character");
 ```
 
-And finally the additionnal code, shorter as possible :
+And finally, the additionnal code, as short as possible:
 
 ```
 int yywrap(void) { return 1; }
 ```
 
 # Build
-The code is [here](https://github.com/RemiBauzac/jit/tree/first-language-parser). To build the parser, clone project and run make. The code build easily on Linux or MacOS
+The code is [here](https://github.com/RemiBauzac/jit/tree/first-language-parser). To build the parser, clone the project and run `make`. The codes build easily on Linux or MacOS:
 
 ```
 $ git clone git@github.com:RemiBauzac/jit.git
@@ -267,10 +268,10 @@ $ ...
 ```
 
 # Run
-To run parser, you have just to run langc binary without parameter: `./langc`. It now wait for commands. You have just to type `return 69` then press enter and Ctrl-D. The parser exits and create out.bc file.
-The out.bc file is the intermediate language (.bc as bytecode).
+To run the parser, you have just to run the `langc` binary, without any parameter: `./langc`. It now waits for commands. You just have to type `return 69` then press <kbd>enter</kbd> and <kbd>Ctrl-D</kbd>. The parser exits and creates the `out.bc` file.  
+This `out.bc` file is the intermediate language (`.bc` as bytecode).
 
-To check the result : run `hexdump out.bc`. Please find the result analysis :
+To check the result, run `hexdump out.bc`. Here is the resulting analysis:
 
 ```
 $ hexdump out.bc
@@ -282,7 +283,7 @@ $ hexdump out.bc
 * the first `01 00 00 00` is the version (please note the big endian representation of integers)
 * the second `01 00 00 00` is the code size
 * the third `01 00 00 00` is the opcode (OP_RETURN)
-* `45 00 00 00 00 00 00 00` is 64 bits big endian representation of 69
+* `45 00 00 00 00 00 00 00` is 64 bits big endian representation of `69`
 
 # What's next
 The next post will be about loading and interpreting this bytecode. See you soon.
