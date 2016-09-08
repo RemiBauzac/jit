@@ -12,11 +12,13 @@ YYC=parser.yacc.c
 YYH=parser.yacc.h
 
 PARSER_O=parser.yacc.o parser.lex.o
+VM_O=vm.o
 LANGC=langc
+LANGVM=langvm
 
-all:$(LANGC)
+all:$(LANGC) $(LANGVM)
 
-o: $(PARSER_O)
+o: $(PARSER_O) $(VM_O)
 
 $(LEXC) $(LEXH):
 	$(LEX) --outfile=$(LEXC) --header-file=$(LEXH) $(LEXL)
@@ -27,8 +29,11 @@ $(YYC) $(YYH):
 sparser.lex.o: $(LEXC) $(LEXH)
 sparser.yacc.o: $(YYC) $(YYH)
 
-$(LANGC): $(PARSER_O)
+$(LANGC): $(PARSER_O) 
+	$(CC) -o $@ $+
+
+$(LANGVM): $(VM_O) 
 	$(CC) -o $@ $+
 
 clean:
-	$(RM) -fr $(LEXC) $(LEXH) $(YYC) $(YYH) $(PARSER_O) $(LANGC)
+	$(RM) -fr $(LEXC) $(LEXH) $(YYC) $(YYH) $(PARSER_O) $(LANGC) $(LANGVM) $(VM_O)

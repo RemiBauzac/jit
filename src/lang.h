@@ -25,9 +25,6 @@ typedef struct _function {
 	operation *code;
 } function;
 
-/* functions */
-function *load_main(const char *filename);
-
 static inline void free_function(function *f)
 {
 	free(f->code);
