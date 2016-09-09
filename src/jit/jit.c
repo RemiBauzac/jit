@@ -16,5 +16,8 @@ int create_binary(function *f) {
 	prog = malloc(f->codesz*MAX_OPSZ);
 	if (!prog) return -1;
 
+	orig = prog; tmp = prog;
+
+
 	return 0;
 }
