@@ -13,6 +13,7 @@ YYH=parser.yacc.h
 
 PARSER_O=parser.yacc.o parser.lex.o
 VM_O=vm.o
+JIT_O=jit/jit.o
 LANGC=langc
 LANGVM=langvm
 
@@ -32,8 +33,8 @@ sparser.yacc.o: $(YYC) $(YYH)
 $(LANGC): $(PARSER_O) 
 	$(CC) -o $@ $+
 
-$(LANGVM): $(VM_O) 
+$(LANGVM): $(VM_O) $(JIT_O)
 	$(CC) -o $@ $+
 
 clean:
-	$(RM) -fr $(LEXC) $(LEXH) $(YYC) $(YYH) $(PARSER_O) $(LANGC) $(LANGVM) $(VM_O)
+	$(RM) -fr $(LEXC) $(LEXH) $(YYC) $(YYH) $(PARSER_O) $(LANGC) $(LANGVM) $(VM_O) $(JIT_O)
