@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
 
 #define LANG_COOKIE  0xdeadbeef
 #define LANG_VERSION 0x00000001 /* mean 0.1 */
