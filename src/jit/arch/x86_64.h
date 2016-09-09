@@ -1,8 +1,6 @@
 #ifndef __X86_64_COMMON_H__
 #define __X86_64_COMMON_H__
 
-#include "../jit.h"
-
 #define NOP  APPEND1(0x90);
 
 #define JIT_PROLOGUE \
@@ -10,5 +8,6 @@
 
 #define JIT_EPILOGUE \
 	APPEND2(0xc9, 0xc3); /* leaveq; retq */
+
 
 #endif

@@ -21,18 +21,10 @@ typedef struct __attribute__((__packed__)) _operation {
 } operation;
 
 typedef struct _function {
-	uint32_t codesz;
+	size_t codesz;
 	operation *code;
-#ifdef JIT
 	uint8_t *binary;
-	uint32_t binarysz;
-#endif
+	size_t binarysz;
 } function;
-
-static inline void free_function(function *f)
-{
-	free(f->code);
-	free(f);
-}
 
 #endif
