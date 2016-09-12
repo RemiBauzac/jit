@@ -121,7 +121,7 @@ int main(int argc, char **argv)
 	if (fmain->binary) {
 		/* cast binary into function pointer */
 		uint64_t (*execute)(void) = (void *)fmain->binary;
-		/* and run this function */
+		/* and call this function */
 		ret = execute();
 	}
 	else {

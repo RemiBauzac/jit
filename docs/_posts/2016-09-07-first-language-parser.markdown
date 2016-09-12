@@ -259,6 +259,12 @@ int yywrap(void) { return 1; }
 {% endhighlight %}
 
 # Build
+
+Before building, you need to install:
+
+* Xcode command line extensions using `xcode-select --install` in command line terminal for MacOS
+* install flex and yacc on Linux (`flex` and `bison` packages for ubuntu and debian)
+
 The code is [here](https://github.com/RemiBauzac/jit/tree/first-language-parser). To build the parser, clone the project and run `make`. The codes build easily on Linux or MacOS:
 
 {% highlight shell %}

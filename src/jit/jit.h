@@ -54,6 +54,7 @@ static inline uint8_t *appendoff(uint8_t *ptr, uint32_t offset) {
 static uint8_t *create_op_return(uint8_t *bin, operation *op)
 {
 	uint8_t *prog = bin;
+	/* mov op->param, %rax */
 	APPEND2(0x48, 0xb8);
 	APPEND(op->param, 8);
 	return prog;
