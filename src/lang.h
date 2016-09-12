@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
 
 #define LANG_COOKIE  0xdeadbeef
 #define LANG_VERSION 0x00000001 /* mean 0.1 */
@@ -21,14 +22,10 @@ typedef struct __attribute__((__packed__)) _operation {
 } operation;
 
 typedef struct _function {
-	uint32_t codesz;
+	size_t codesz;
 	operation *code;
+	uint8_t *binary;
+	size_t binarysz;
 } function;
-
-static inline void free_function(function *f)
-{
-	free(f->code);
-	free(f);
-}
 
 #endif

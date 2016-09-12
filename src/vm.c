@@ -1,4 +1,12 @@
 #include "lang.h"
+#include "jit/jit.h"
+
+static inline void free_function(function *f)
+{
+	free(f->code);
+	bin_free(f);
+	free(f);
+}
 
 static function *load_main(const char *filename)
 {
@@ -35,6 +43,7 @@ static function *load_main(const char *filename)
 	/* Alloc main function structure */
 	main = malloc(sizeof(function));
 	if (!main) return NULL;
+	memset(main, 0, sizeof(function));
 
 	/* Read 32 bits code size from file */
 	fread(&main->codesz, sizeof(uint32_t), 1, bcf);
@@ -86,17 +95,39 @@ int main(int argc, char **argv)
 {
 	function *fmain;
 	int64_t ret = 0;
+	int jit = 0;
+	char *filename;
 
-	if (argc != 2) {
-		fprintf(stderr, "usage: %s <file>\n", argv[0]);
+	if (argc == 3 && !strcmp(argv[1], "-j")) {
+		jit = 1;
+		filename = argv[2];
+	}
+	else if (argc == 2) {
+		filename = argv[1];
+	}
+	else {
+		fprintf(stderr, "usage: %s [-j] <file>\n", argv[0]);
 		exit(1);
 	}
 	/* load main function, exit on error */
-	fmain = load_main(argv[1]);
+	fmain = load_main(filename);
 	if (!fmain) exit(1);
 
-	/* start interpreter, get return value and print it */
-	ret = interpret(fmain);
+	/* create executable */
+	if (jit) {
+		create_binary(fmain);
+	}
+
+	if (fmain->binary) {
+		/* cast binary into function pointer */
+		uint64_t (*execute)(void) = (void *)fmain->binary;
+		/* and call this function */
+		ret = execute();
+	}
+	else {
+		/* start interpreter, get return value and print it */
+		ret = interpret(fmain);
+	}
 	fprintf(stdout, "Return value is %lld\n", ret);
 
 	/* cleanly exit from interpreter */
