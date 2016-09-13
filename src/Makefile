@@ -21,7 +21,7 @@ LANGC=langc
 LANGVM=langvm
 
 all:$(LANGC) $(LANGVM)
-CFLAGS=-D$(ARCH) -D$(OS)
+CFLAGS=-D$(ARCH) -D$(OS) -g
 
 o: $(PARSER_O) $(VM_O)
 
