@@ -98,26 +98,9 @@ It's easy to allocate memory, using malloc function. It's more complexe to make 
 * Executable memory has to be aligned to OS memory page size
 * Making memory executable is OS dependant for security reasons
 
-For Linux, you have to 
+fortunately, Linux and MacOS shared the same way to make memory mapping and create executable piece of memory.
 
-* allocate memory, aligned to OS page size :
-
-{% highlight c %}
-  f->binary = memalign(PAGE_SIZE, f->binarysz);
-  if (!f->binarysz) return 1;
-{% endhighlight %}
-
-* Make it executabe with memory protect
-
-{% highlight c %}
-  if (mprotect(f->binary, f->binarysz, PROT_EXEC|PROT_READ|PROT_WRITE) == -1) {
-    bin_free(f);
-    return 1;
-  }
-{% endhighlight %}
-
-
-For MacOS, you have to :
+You have to:
 
 * Compute allocation size:
 
