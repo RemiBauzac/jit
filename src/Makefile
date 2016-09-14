@@ -2,9 +2,6 @@ LEX=/usr/bin/lex
 YACC=/usr/bin/yacc
 CC=gcc
 
-ARCH?=x86_64
-OS?=macos
-
 # -- Don't touch above this line
 # Parser files
 LEXL=parser.l
@@ -21,7 +18,7 @@ LANGC=langc
 LANGVM=langvm
 
 all:$(LANGC) $(LANGVM)
-CFLAGS=-D$(ARCH) -D$(OS) -g
+CFLAGS=-g
 
 o: $(PARSER_O) $(VM_O)
 

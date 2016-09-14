@@ -37,19 +37,16 @@ static inline uint8_t *appendoff(uint8_t *ptr, uint32_t offset) {
 #define APPEND4(b1, b2, b3, b4)   APPEND((b1) + ((b2) << 8) + ((b3) << 16) + ((b4) << 24), 4)
 
 
-#if defined(x86_64)
+#ifdef __x86_64__
 #include "arch/x86_64.h"
 #else
 #error Unsupported architecture
 #endif
 
-#if defined(macos)
-#include "os/macos.h"
-#elif defined (linux)
-#include "os/linux.h"
-#else
-#error Unsupported os
+#if defined(__linux__) || defined(__APPLE__)
+#include "os/unix.h"
 #endif
+
 
 static uint8_t *create_op_return(uint8_t *bin, operation *op)
 {
