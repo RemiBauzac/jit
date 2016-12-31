@@ -1,5 +1,6 @@
 %{
 #include "parser.yacc.h"
+#include "lang_function.h"
 void yyerror(char *);
 %}
 
@@ -13,7 +14,6 @@ float       [-]?{integer}("."{integer})?{exponent}?
 var          [a-zA-Z0-9]+
 %%
 
-"return" return RETURN;
 {whitespace} ; /* ignoring whitespaces */
 
 {integer} {
@@ -26,11 +26,12 @@ var          [a-zA-Z0-9]+
   return FLOAT;
 }
 
-"+" return ADD;
-"-" return SUB;
-"*" return MUL;
-"/" return DIV;
+"return" return RETURN;
 "=" return LOAD;
+"+" {
+  yylval.op = OP_ADD;
+  return OPERATOR;
+}
 ";" return ENDCMD;
 {var} {
   yylval.s = strdup(yytext);

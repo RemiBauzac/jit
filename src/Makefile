@@ -14,13 +14,14 @@ YYH=parser.yacc.h
 PARSER_O=parser.yacc.o parser.lex.o
 VM_O=vm.o
 JIT_O=jit/jit.o
+LIB_O=htable.o
 LANGC=langc
 LANGVM=langvm
 
 all:$(LANGC) $(LANGVM)
 CFLAGS=-g
 
-o: $(PARSER_O) $(VM_O)
+o: $(PARSER_O) $(VM_O) $(LIB_O)
 
 $(LEXC) $(LEXH):
 	$(LEX) --outfile=$(LEXC) --header-file=$(LEXH) $(LEXL)
@@ -31,11 +32,11 @@ $(YYC) $(YYH):
 sparser.lex.o: $(LEXC) $(LEXH)
 sparser.yacc.o: $(YYC) $(YYH)
 
-$(LANGC): $(PARSER_O) 
+$(LANGC): $(PARSER_O) $(LIB_O) 
 	$(CC) -o $@ $+
 
-$(LANGVM): $(VM_O) $(JIT_O)
+$(LANGVM): $(VM_O) $(JIT_O) $(LIB_O)
 	$(CC) -o $@ $+
 
 clean:
-	$(RM) -fr $(LEXC) $(LEXH) $(YYC) $(YYH) $(PARSER_O) $(LANGC) $(LANGVM) $(VM_O) $(JIT_O)
+	$(RM) -fr $(LEXC) $(LEXH) $(YYC) $(YYH) $(PARSER_O) $(LANGC) $(LANGVM) $(VM_O) $(LIB_O) $(JIT_O) 

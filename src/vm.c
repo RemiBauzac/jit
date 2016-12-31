@@ -87,48 +87,37 @@ static function *load_main(const char *filename)
     return NULL;
   }
 
-  /* Alloc stack now */
-  fread(&main->stacksz, sizeof(size_t), 1, bcf);
-  if (main->stacksz > 0) {
-    main->stack = malloc(sizeof(value)*main->stacksz);
-    if (!main->stack) {
-      fprintf(stderr, "Cannot allocate stack\n");
-      fclose(bcf);
-      free(main->code);
-      free(main->k);
-      free(main);
-      return NULL;
-    }
-  }
   return main;
 }
 
-static int64_t interpret(function *fmain)
+static int64_t interpret(call *c)
 {
   int pc;
   int64_t ret = 0;
+  function *f;
   operation op;
   value *a, *b, *r;
+  
+  if (!c) return ret;
+  f = c->f;
 
-  /* walking through main function */
-  for(pc = 0; pc < fmain->codesz; pc++) {
-    op = fmain->code[pc];
+  /* walking through opcodes */
+  for(pc = 0; pc < f->codesz; pc++) {
+    op = f->code[pc];
     switch(op.op) {
       /* On return, get the return value from parameters and exit */
       case OP_RETURN:
-        a = VALUEA(fmain, op);
-        ret = ivalue(*a);
+        return ivalue(c->stack[op.r]);
+        break;
+      case OP_LOAD_CONST:
+        c->stack[op.r] = f->k[op.a];
         break;
       case OP_LOAD:
-        a = VALUEA(fmain, op);
-        r = VALUER(fmain, op);
-        ivalue(*r) = ivalue(*a);
+        c->stack[op.r] = c->stack[op.a];
         break;
       case OP_ADD:
-        a = VALUEA(fmain, op);
-        b = VALUEB(fmain, op);
-        r = VALUER(fmain, op);
-        ivalue(*r) = ivalue(*a) + ivalue(*b);
+        setivalue(c->stack[op.r],
+            ivalue(c->stack[op.a]) + ivalue(c->stack[op.b]))
         break;
       /* Handle error case */
       case OP_NONE:
@@ -174,12 +163,25 @@ int main(int argc, char **argv)
     ret = execute();
   }
   else {
+    /* create a call */
+    call *ci = malloc(sizeof(call));
+    if (!ci) {
+      free_function(fmain);
+      exit(ENOMEM);
+    }
+    ci->f = fmain;
+    ci->stack = malloc(sizeof(value)*fmain->stacksz);
+    if (!ci->stack) {
+      free_function(fmain);
+      exit(ENOMEM);
+    }
     /* start interpreter, get return value and print it */
-    ret = interpret(fmain);
+    ret = interpret(ci);
+    free_call(ci);
   }
   fprintf(stdout, "Return value is %lld\n", ret);
+  free_function(fmain);
 
   /* cleanly exit from interpreter */
-  free_function(fmain);
   exit(0);
 }

@@ -1,6 +1,7 @@
 /* native language declarations */
 %{
 #include "lang.h"
+#include "htable.h"
 
 /* parsing variables used by lex and yacc */
 int yylex(void);
@@ -14,8 +15,8 @@ value v;
 function *fmain;
 FILE *out;
 static void append_code(function *f, operation o);
-static uint32_t add_local(function *f, const char *var);
-static uint32_t lookup_local(function *f, const char *var);
+static uint32_t add_local(function *f, char *var);
+static uint32_t lookup_local(function *f, char *var);
 static uint32_t add_k(function *f, value v);
 
 static void dump_function(FILE *out, function *f);
@@ -26,18 +27,22 @@ static void dump_function(FILE *out, function *f);
 %union {
   int64_t integer;
   double  flt;
-  const char *s;
+  char *s;
+  uint32_t sp;
+  uint32_t op;
 };
 
-/* tokens definition. INTEGER and RETURN are defined in lexer (sparser.l) */
+/* tokens definition. INTEGER and RETURN are defined in lexer (parser.l) */
 %token <integer> INTEGER
 %token <flt> FLOAT
 %token RETURN
-%token ADD SUB MUL DIV
 %token LOAD 
 %token LOCAL
 %token ENDCMD
+%token <op>OPERATOR 
 %token <s> VAR
+
+%type <sp>value
 
 /* start grammar axiom */
 %start program
@@ -50,37 +55,40 @@ program:
   ;
 
 statement:
-  expression { }
-  | RETURN expression ENDCMD {
+  RETURN value ENDCMD {
     op.op = OP_RETURN ;
+    op.r = $2;
     append_code(fmain, op);
   }
   | VAR LOAD expression ENDCMD {
     op.r = add_local(fmain, $1);
-    op.wr = LANG_VAR;
+    append_code(fmain, op);
+  }
+  | VAR LOAD value ENDCMD {
+    op.r = add_local(fmain, $1);
+    op.a = $3; op.op = OP_LOAD;
     append_code(fmain, op);
   }
   ;
 
-expression:
+value:
   INTEGER {
-    v.type = TYPE_INT; ivalue(v) = $1;
-    op.a = add_k(fmain, v); op.wa = LANG_CONST;
+    setivalue(v, $1);
+    op.a = add_k(fmain, v);
+    op.r = fmain->stacksz++;
+    op.op = OP_LOAD_CONST;
+    append_code(fmain, op);
+    $$ = op.r;
   }
   | VAR {
-    uint32_t a = lookup_local(fmain, $1);
-    if (a == UINT32_MAX) {
-      yyerror("cannot find variable");
-      YYERROR;
-    }
-    op.a = a; op.wa = LANG_VAR; op.op = OP_LOAD;
+    $$ = lookup_local(fmain, $1);
   }
-  | INTEGER ADD INTEGER {
-    v.type = TYPE_INT; ivalue(v) = $1;
-    op.a = add_k(fmain, v); op.wa = LANG_CONST;
-    v.type = TYPE_INT; ivalue(v) = $3;
-    op.b = add_k(fmain, v); op.wb = LANG_CONST;
-    op.op = OP_ADD;
+  ;
+
+expression:
+  | value OPERATOR value {
+    op.a = $1; op.b = $3;
+    op.op = $2;
   }
   ;
 
@@ -104,10 +112,12 @@ static void append_code(function *f, operation o)
   f->code = realloc(f->code, f->codesz*sizeof(o));
   if (f->code)
     f->code[f->codesz-1] = o;
+  /* clear operator */
+  memset(&o, 0, sizeof(o));
 }
 
 /**
- * append a value to local variables list
+ * append a value to const value list
  * This function is suboptimal but easy to understand.
  * We have to change it to avoid realloc on each stack need
  */
@@ -120,39 +130,39 @@ static uint32_t add_k(function *f, value v)
   return f->ksz-1;
 }
 
-static uint32_t add_local(function *f, const char *var)
+/**
+ * add a local var to var list
+ */
+static uint32_t add_local(function *f, char *var)
 {
-  uint32_t i;
+  value v, *r;
 
-  for (i = 0; i < f->stacksz; i++) {
-    if (f->vars[i] && !strcmp(f->vars[i], var)) {
-      return i;
-    }
+  r = ht_get(f->vars, var);
+  if (!r) {
+    setivalue(v, f->stacksz);
+    ht_set(f->vars, var, v);
+    f->stacksz += 1;
+    r = ht_get(f->vars, var);
   }
-  /* nothing found about var add it*/
-  f->stacksz += 1;
-  f->vars = realloc(f->vars, f->stacksz*sizeof(char *));
-  f->vars[f->stacksz-1] = var;
-  return f->stacksz-1;
+  return ivalue(*r);
 }
 
-static uint32_t lookup_local(function *f, const char *var)
+static uint32_t lookup_local(function *f, char *var)
 {
-  uint32_t i;
+  value *r;
 
-  for (i = 0; i < f->stacksz; i++) {
-    if (f->vars[i] && !strcmp(f->vars[i], var)) {
-      return i;
-    }
+  r = ht_get(f->vars, var);
+  if (!r) {
+    yyerror("cannot find variable");
+    return 0;
   }
-  return UINT32_MAX;
+  return ivalue(*r);
 }
 
 static void dump_function(FILE *out, function *f)
 {
   uint32_t cookie = LANG_COOKIE, version = LANG_VERSION;
   if (!out || !f) return;
-  f->stack = NULL;
   fwrite(&cookie,  sizeof(char), sizeof(uint32_t), out);
   fwrite(&version, sizeof(char), sizeof(uint32_t), out);
   fwrite(&f->codesz, sizeof(size_t), 1, out);
@@ -171,11 +181,19 @@ static void dump_function(FILE *out, function *f)
 int main(int argc, char **argv) {
   char *outname = "out.bc";
 
+  /* Init variables */
   fmain = malloc(sizeof(function));
   if (!fmain) {
     fprintf(stderr, "Cannot alloc main function\n");
     exit(ENOMEM);
   }
+  memset(&op, 0, sizeof(operation));
+
+  /**
+   * init fmain
+   */
+   memset(fmain, 0, sizeof(function));
+   fmain->vars = ht_create(100);
 
   /* Simple args parsing */
   /* Open input file if needed. If not available, use yyparse use stdin */
@@ -195,19 +213,17 @@ int main(int argc, char **argv) {
     }
   }
 
-  /* open output file */
-  out = fopen(outname, "wb");
-  if (!out) {
-    fclose(yyin);
-    fprintf(stderr, "Cannot open output file %s\n", outname);
-    exit(ENOENT);
+  if (yyparse() == 0) {
+    /* if parsing is ok, dump main function to file */
+    /* open output file */
+    out = fopen(outname, "wb");
+    if (!out) {
+      fclose(yyin);
+      fprintf(stderr, "Cannot open output file %s\n", outname);
+      exit(ENOENT);
+    }
+    dump_function(out, fmain);
   }
-  /* initialise main function */
-  memset(fmain, 0, sizeof(function));
-
-  yyparse();
-  /* if parsing is ok, dump main function to file */
-  dump_function(out, fmain);
   free_function(fmain);
   fclose(yyin);
   fclose(out);
