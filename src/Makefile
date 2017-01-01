@@ -1,6 +1,7 @@
 LEX=/usr/bin/lex
 YACC=/usr/bin/yacc
 CC=gcc
+DEBUG=yes
 
 # -- Don't touch above this line
 # Parser files
@@ -14,12 +15,14 @@ YYH=parser.yacc.h
 PARSER_O=parser.yacc.o parser.lex.o
 VM_O=vm.o
 JIT_O=jit/jit.o
-LIB_O=htable.o
+LIB_O=htable.o marshal.o
 LANGC=langc
 LANGVM=langvm
 
 all:$(LANGC) $(LANGVM)
-CFLAGS=-g
+ifeq ($(DEBUG), yes)
+CFLAGS=-g -DDEBUG -DYYDEBUG
+endif
 
 o: $(PARSER_O) $(VM_O) $(LIB_O)
 

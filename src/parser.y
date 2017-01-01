@@ -2,6 +2,7 @@
 %{
 #include "lang.h"
 #include "htable.h"
+#include "marshal.h"
 
 /* parsing variables used by lex and yacc */
 int yylex(void);
@@ -18,8 +19,6 @@ static void append_code(function *f, operation o);
 static uint32_t add_local(function *f, char *var);
 static uint32_t lookup_local(function *f, char *var);
 static uint32_t add_k(function *f, value v);
-
-static void dump_function(FILE *out, function *f);
 %}
 
 
@@ -159,20 +158,6 @@ static uint32_t lookup_local(function *f, char *var)
   return ivalue(*r);
 }
 
-static void dump_function(FILE *out, function *f)
-{
-  uint32_t cookie = LANG_COOKIE, version = LANG_VERSION;
-  if (!out || !f) return;
-  fwrite(&cookie,  sizeof(char), sizeof(uint32_t), out);
-  fwrite(&version, sizeof(char), sizeof(uint32_t), out);
-  fwrite(&f->codesz, sizeof(size_t), 1, out);
-  fwrite(f->code, sizeof(operation), f->codesz, out);
-  fwrite(&f->ksz, sizeof(size_t), 1, out);
-  fwrite(f->k, sizeof(value), f->ksz, out);
-  fwrite(&f->stacksz, sizeof(size_t), 1, out);
-}
-
-
 /**
  * main parser function:
  * argv[1] is the input file name, by default stdin
@@ -222,7 +207,7 @@ int main(int argc, char **argv) {
       fprintf(stderr, "Cannot open output file %s\n", outname);
       exit(ENOENT);
     }
-    dump_function(out, fmain);
+    marshal(out, fmain);
   }
   free_function(fmain);
   fclose(yyin);

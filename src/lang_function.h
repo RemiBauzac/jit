@@ -13,6 +13,15 @@ typedef enum {
   OP_ADD,
 } opCode;
 
+static char *op2str[] =
+{
+  "NONE",
+  "RETURN",
+  "LOAD_CONST",
+  "LOAD",
+  "ADD"
+};
+
 #define NUM_OPCODES ((int)OP_RETURN + 1)
 
 typedef struct __attribute__((__packed__)) _operation {
