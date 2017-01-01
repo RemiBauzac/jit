@@ -32,6 +32,14 @@ static int64_t interpret(call *c)
         setivalue(c->stack[op.r],
             ivalue(c->stack[op.a]) + ivalue(c->stack[op.b]))
         break;
+      case OP_SUB:
+        setivalue(c->stack[op.r],
+            ivalue(c->stack[op.a]) - ivalue(c->stack[op.b]))
+        break;
+      case OP_MUL:
+        setivalue(c->stack[op.r],
+            ivalue(c->stack[op.a]) * ivalue(c->stack[op.b]))
+        break;
       /* Handle error case */
       case OP_NONE:
       default:

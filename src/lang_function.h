@@ -11,6 +11,8 @@ typedef enum {
   OP_LOAD_CONST,
   OP_LOAD,
   OP_ADD,
+  OP_SUB,
+  OP_MUL,
 } opCode;
 
 static char *op2str[] =
@@ -20,6 +22,8 @@ static char *op2str[] =
   "LOAD_CONST",
   "LOAD",
   "ADD"
+  "SUB",
+  "MUL"
 };
 
 #define NUM_OPCODES ((int)OP_RETURN + 1)

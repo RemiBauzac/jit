@@ -32,6 +32,15 @@ var          [a-zA-Z0-9]+
   yylval.op = OP_ADD;
   return OPERATOR;
 }
+"-" {
+  yylval.op = OP_SUB;
+  return OPERATOR;
+}
+"*" {
+  yylval.op = OP_MUL;
+  return OPERATOR;
+}
+
 ";" return ENDCMD;
 {var} {
   yylval.s = strdup(yytext);
