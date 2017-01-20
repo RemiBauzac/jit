@@ -130,7 +130,7 @@ $1 = (uint8_t *) 0x7ffff7ff4000 "UH\211\345H\270!"
 (gdb)
 {% endhighlight %}
 
-Now you know the binary's address to set breakpoint and start bianry debug session.
+Now you know the binary's address to set breakpoint and start binary debug session.
 
 ## lldb
 
