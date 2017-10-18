@@ -10,7 +10,9 @@ extern FILE *yyout;
 
 /* tiny binary output */
 operation op;
-function fmain;
+object *fmain;
+htable *code;
+
 FILE *out;
 static void append_code(function *f, operation o);
 static void dump_function(FILE *out, function *f);
@@ -37,7 +39,11 @@ program:
 
 main:
 	|
-	RETURN INTEGER { op.op = OP_RETURN ; op.param = $2; append_code(&fmain, op); }
+	RETURN INTEGER {
+		op.op = OP_RETURN;
+		setobji(&op.param, $2);
+		append_code(code, op);
+	}
 	;
 
 %%
@@ -54,8 +60,9 @@ void yyerror(char *s) {
  * This function is suboptimal but easy to understand.
  * We have to change it to avoid realloc on each operation
  */
-static void append_code(function *f, operation o)
+static void append_code(htable *code, operation o)
 {
+  
 	f->codesz += 1;
 	f->code = realloc(f->code, f->codesz*sizeof(o));
 	if (f->code)
@@ -110,8 +117,7 @@ int main(int argc, char **argv) {
 		exit(1);
 	}
 	/* initialise main function */
-	fmain.codesz = 0;
-	fmain.code = NULL;
+	fmain = newfunction("main");
 
 	yyparse();
 	/* if parsing is ok, dump main function to file */
