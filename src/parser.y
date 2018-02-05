@@ -25,6 +25,7 @@ static void dump_function(FILE *out, function *f);
 /* tokens definition. INTEGER and RETURN are defined in lexer (sparser.l) */
 %token <integer> INTEGER
 %token RETURN
+%token END
 
 /* start grammar axiom */
 %start program
@@ -32,13 +33,21 @@ static void dump_function(FILE *out, function *f);
 %%
 
 program:
-	main
+	operations
 	;
 
-main:
-	|
-	RETURN INTEGER { op.op = OP_RETURN ; op.param = $2; append_code(&fmain, op); }
+operations:
+  | operation END
+	| operations operation END
+
+
+operation: return_operations
+
+
+return_operations:
+	| RETURN INTEGER { op.op = OP_RETURN ; op.a = $2; append_code(&fmain, op); }
 	;
+
 
 %%
 

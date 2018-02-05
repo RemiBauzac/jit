@@ -82,7 +82,7 @@ static int64_t interpret(function *fmain)
 		switch(op.op) {
 			/* On return, get the return value from parameters and exit */
 			case OP_RETURN:
-				ret = op.param;
+				ret = op.a;
 				break;
 			/* Handle error case */
 			case OP_NONE:

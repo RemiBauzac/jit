@@ -15,7 +15,12 @@ void yyerror(char *);
 	yylval.integer = strtoll(yytext, (char **)NULL, 10);
 	return INTEGER;
 }
+
+; return END;
+
 .  yyerror("Unknown character");
+
+
 
 %%
 

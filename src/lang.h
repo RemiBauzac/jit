@@ -18,7 +18,8 @@ typedef enum {
 
 typedef struct __attribute__((__packed__)) _operation {
 	uint32_t op;
-	int64_t param;
+	int64_t a;
+	int64_t b;
 } operation;
 
 typedef struct _function {
