@@ -12,7 +12,7 @@ static function *load_main(const char *filename)
 {
 	function *main = NULL;
 	FILE *bcf;
-	int cookie = 0, version = 0;
+	uint32_t cookie = 0, version = 0;
 	size_t codesz;
 
 	/* Open file */
@@ -23,7 +23,8 @@ static function *load_main(const char *filename)
 	}
 
 	/* Check cookie */
-	fread(&cookie, sizeof(char), 4, bcf);
+	fread(&cookie, sizeof(uint32_t), 1, bcf);
+	cookie = ntohl(cookie);
 	if (cookie != LANG_COOKIE) {
 		fprintf(stderr, "Bad bytecode file format\n");
 		fclose(bcf);
@@ -34,7 +35,8 @@ static function *load_main(const char *filename)
 	 * Check version.
 	 * Useless now, but it will be helpful later
 	 */
-	fread(&version, sizeof(char), 4, bcf);
+	fread(&version, sizeof(uint32_t), 1, bcf);
+	version = ntohl(version);
 	if (version != LANG_VERSION) {
 		fprintf(stderr, "Bad lang version %d. %d was awaited\n", version, LANG_VERSION);
 		return NULL;
@@ -47,6 +49,7 @@ static function *load_main(const char *filename)
 
 	/* Read 32 bits code size from file */
 	fread(&main->codesz, sizeof(uint32_t), 1, bcf);
+	main->codesz = ntohl(main->codesz);
 	if (main->codesz == 0) {
 		fprintf(stderr, "Empty bytecode file\n");
 		return main;

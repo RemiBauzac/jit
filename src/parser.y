@@ -68,11 +68,12 @@ static void append_code(function *f, operation o)
  */
 static void dump_function(FILE *out, function *f)
 {
-  int cookie = LANG_COOKIE, version = LANG_VERSION;
+  uint32_t cookie = htonl(LANG_COOKIE), version = htonl(LANG_VERSION);
+  uint32_t codesz = htonl(f->codesz);
   if (!out || !f) return;
-  fwrite(&cookie,  sizeof(char), 4, out);
-  fwrite(&version, sizeof(char), 4, out);
-  fwrite(&f->codesz, sizeof(uint32_t), 1, out);
+  fwrite(&cookie,  sizeof(uint32_t), 1, out);
+  fwrite(&version, sizeof(uint32_t), 1, out);
+  fwrite(&codesz, sizeof(uint32_t), 1, out);
   fwrite(f->code, sizeof(operation), f->codesz, out);
 }
 
