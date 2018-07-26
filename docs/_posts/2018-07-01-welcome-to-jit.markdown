@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Welcome to JiT workshop"
-date:   2016-08-30 23:33:53 +0200
+date:   2018-07-01
 author: Rémi Bauzac
 
 ---
