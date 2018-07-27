@@ -1,10 +1,14 @@
 ---
 layout: post
-title:  "First language parser"
+title:  "Parser and bytecode"
 date:   2018-07-14
 author: Rémi Bauzac
 
 ---
+
+This article is about the **compilation** from high level language to  intermediate language. Its goal is to introduce (and make understandable as possible) the intermediate languages and bytecode concepts.
+
+# Introducion
 
 An interpreted language is divided in 2 parts:
 

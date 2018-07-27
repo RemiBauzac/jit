@@ -1,12 +1,12 @@
 ---
 layout: post
-title:  "Reminder"
+title:  "A bit of theory"
 date:   2018-07-07
 author: Rémi Bauzac
 
 ---
 
-Before dipping into code, a short reminder is required.
+Before dipping into code, a short theorical reminder is required.
 
 # vocabulary
 
@@ -45,7 +45,7 @@ The following table lists different interpreters:
 | Interpreted language   | JiT VM |  Project's URL |
 |----------------------|--------|----------------|
 | PHP |  HHVM | http://hhvm.com |
-| Javascript | SpiderMonkey  | http://developer.mozilla.org/en/SpiderMonkey |
+| Javascript | IonMonkey  | https://wiki.mozilla.org/IonMonkey |
 | Java | Oracle JVM, JatoVM | http://www.oracle.com/fr/java/overview/index.html, http://jatovm.org |
 | Python | PyPy | http://pypy.org |
 | Lua | LuaJit or my own lua JiT project | http://luajit.org|
